@@ -17,11 +17,11 @@ require('../components/HomeLunbo.js');
 require('../components/HomeTxt.js');
 
 
-$(document).ready(function(){
+// $(document).ready(function(){
     
 
    
-})
+// })
 
 
 

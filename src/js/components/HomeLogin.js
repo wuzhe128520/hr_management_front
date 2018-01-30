@@ -1,5 +1,5 @@
 
-const com = require('../page/common.js');
+// const com = require('../page/common.js');
 // 点击切换个人，企业
 $('#loginTit .loginTit').on('click',function(e){
     $('#loginTit .loginTit').removeClass('active');
@@ -38,6 +38,10 @@ $('#loginOne .login1').on('click',function(){
     );
 })
 
+// 注册
+$('#loginOne .regist').on('click',function(){
+    location.href = '/view/regist.html'
+})
 
 
 module.exports = {};

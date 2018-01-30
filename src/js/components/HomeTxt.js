@@ -1,8 +1,7 @@
 
 
 
-const txt = require('../../images/1.txt');
-console.log(txt);
+
 
 
 

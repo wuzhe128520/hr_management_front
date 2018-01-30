@@ -20,10 +20,10 @@ const path = require('path'),
           //打包前的原始路径
           origin: {
             //入口文件的路径(正则表示)
-            entryJs: './src/js/page/',
+            entryJs: './src/js/pages/',
 
             //页面模板路径(正则表示)
-            tmpls: './src/view/'
+            tmpls: './src/view/pages/'
           } ,
 
           //打包后的路径
@@ -145,6 +145,7 @@ let config = {
                                     loader: 'file-loader',
                                     options: {
                                         name: 'fonts/[name].[ext]?v=[hash:8]',
+                                        publicPath: '../'
                                     }
                                 }
                             ]

@@ -1,12 +1,57 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <title>注册</title>
+    <meta name="description" content="">
+    <meta name="keywords" content="">
 </head>
 <body>
-    
+    <header>
+        <div class="centonts">
+            <a title="回首页" href="/view"><img src="../../images/index/LOGO.png" alt=""></a>
+            <span>流动人员综合平台管理</span>
+        </div>
+    </header>
+    <div class="centonts" id="content">
+        <div class="left">
+            <img src="../../images/regist.jpg" alt="">
+        </div>
+        <div class="right">
+            <div class="right1">
+                <p>注册帐号</p>
+                <form id="regForm">
+                    <div class="input">
+                        <input type="text" placeholder="输入手机号" name="phone" pattern="^1[3|4|5|8]\d{9}$" required>
+                        <img src="../../images/img/regphone.png" alt="">
+                    </div>
+                    <div class="input input1">
+                        <input type="text" placeholder="输入验证码" name="captcha" required>
+                        <button id="captcha" type="button">获取验证码</button>
+                        <br>
+                        <span class="captcha1" style="display:none">短信激活码已经发送，请于30分钟内填写</span>
+                    </div>
+                    <div class="input">
+                        <input type="text" placeholder="昵称" name="username" required>
+                        <img class="img1" src="../../images/img/reghead.png" alt="">
+                        <span>（不得超过8个字符）</span>
+                    </div>
+                    <div class="input">
+                        <input type="password" placeholder="密码" required name="psw">
+                        <img src="../../images/img/reglock.png" alt="" >
+                        <span>6~20个字符，请不要输入非法字符</span>
+                    </div>
+                    <div class="input">
+                        <input type="password" placeholder="确认密码" required name="psw2">
+                        <img src="../../images/img/reglock2.png" alt="" >
+                    </div>
+                    <button class="btn">注册</button>
+                </form>
+                
+            </div>
+        </div>
+    </div>
 </body>
 </html>

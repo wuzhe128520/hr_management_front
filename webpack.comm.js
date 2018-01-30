@@ -51,7 +51,7 @@ let config = {
             new cleanWebpackPlugin(['dist']),
 
              //提取行内css样式到单独的文件
-            new extractTextWebpackPlugin('css/[name].css?v=[chunkhash:8]'),
+            new extractTextWebpackPlugin('css/[name].css'),
 
             //全局加载jq
             new webpack.ProvidePlugin({
@@ -111,7 +111,7 @@ let config = {
                                 {
                                     loader: 'url-loader',
                                     options: {
-                                        name: 'images/[name].[ext]?v=[hash:8]',
+                                        name: 'images/[name].[ext]',
 
                                         //将8KB以下的图片转换为base64的dataURL输出形式
                                         limit: 8192,
@@ -144,7 +144,7 @@ let config = {
                                 {
                                     loader: 'file-loader',
                                     options: {
-                                        name: 'fonts/[name].[ext]?v=[hash:8]',
+                                        name: 'fonts/[name].[ext]',
                                         publicPath: '../'
                                     }
                                 }
@@ -168,10 +168,10 @@ let config = {
             //生成后的bundle.js的访问目录
             //publicPath: '/dist/',
 
-            filename: 'js/[name].bundle.js?v=[hash:8]', //这里的路径是相对于build的
+            filename: 'js/[name].bundle.js', //这里的路径是相对于build的
 
             //未配置在entry中，但是在入口js文件中被引用的所有js文件被打包后的路径和文件名
-            chunkFilename: 'js/[id].bundle.js?v=[hash:8]'
+            chunkFilename: 'js/[id].bundle.js'
 
         }
 };

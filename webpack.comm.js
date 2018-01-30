@@ -5,21 +5,46 @@
  * @version $Id$
  */
 const path = require('path'),
+      glob = require('glob'),
       htmlWebpackPlugin = require('html-webpack-plugin'),
       cleanWebpackPlugin = require('clean-webpack-plugin'),
       extractTextWebpackPlugin = require('extract-text-webpack-plugin'),
-      webpack = require('webpack');
+      webpack = require('webpack'),
+
+      //公共使用的第三方库，单独打包到一个文件里避免长效缓存失败
+      vendors = ['jquery', 'lodash'],
+
+      //文件路径
+      fileDir = {
+
+          //打包前的原始路径
+          origin: {
+            //入口文件的路径(正则表示)
+            entryJs: './src/js/page/',
+
+            //页面模板路径(正则表示)
+            tmpls: './src/view/'
+          } ,
+
+          //打包后的路径
+          build: {
+
+              //打包后的html存放目录
+              view: './view/',
+
+          }
+      };
 
 let config = {
 
-        entry: {
+        /*entry: {
             //这里的路径是相对于配置文件的当前目录
             index: './src/js/page/index.js',
 
             //设置引用的第三方库合并后的文件名为vendor
-            vendor: ['jquery', 'lodash']
+            vendor: ['jquery', 'lodash'],
 
-        },
+        },*/
 
         plugins: [
 
@@ -31,10 +56,10 @@ let config = {
             //全局加载jq
             new webpack.ProvidePlugin({
                 $: 'jquery'
-            }),
+            })
 
              //生成html页面
-            new htmlWebpackPlugin({
+            /*new htmlWebpackPlugin({
 
                 //网站图标
                 favicon: './src/images/favicon.ico',
@@ -46,7 +71,7 @@ let config = {
                 template: './src/view/index.html',
 
                 //js和css插入到页面的位置
-                inject: true,
+                inject: 'body',
 
                 //hash: true,
 
@@ -60,7 +85,7 @@ let config = {
                     collapseWhitespace: false
 
                 }
-            }),
+            }),*/
         ],
 
         module: {
@@ -105,6 +130,12 @@ let config = {
                                 'html-loader'
                             ]
                         },
+                        {
+                            test: /\.ejs$/,
+                            use: [
+                                'ejs-loader'
+                            ]
+                        },
 
                         //加载字体
                         {
@@ -114,7 +145,6 @@ let config = {
                                     loader: 'file-loader',
                                     options: {
                                         name: 'fonts/[name].[ext]?v=[hash:8]',
-                                        publicPath: '../'
                                     }
                                 }
                             ]
@@ -124,11 +154,6 @@ let config = {
                         {
                             test: /\.less$/,
                             loader: extractTextWebpackPlugin.extract('css-loader!less-loader')
-                        },
-                        // 编译txt
-                        {
-                            test: /\.txt$/,
-                            use: 'raw-loader',
                         }
 
                 ]
@@ -140,17 +165,128 @@ let config = {
             path: path.resolve(__dirname, 'dist'),
 
             //生成后的bundle.js的访问目录
-            //publicPath: '/build/',
+            //publicPath: '/dist/',
 
             filename: 'js/[name].bundle.js?v=[hash:8]', //这里的路径是相对于build的
 
-            //未配置在入口文件中的js文件打包后的路径和文件名
+            //未配置在entry中，但是在入口js文件中被引用的所有js文件被打包后的路径和文件名
             chunkFilename: 'js/[id].bundle.js?v=[hash:8]'
 
         }
 };
+
+ //根据给定的值删除数组对应的值
+ function deleteByValue(ary, value, isDeleteAll){
+
+            var i = 0,
+                length = ary.length;
+
+            for(; i < length; i++){
+
+                if(value === ary[i]){
+                    ary.splice(i,1);
+
+                    //是否删除所有跟value一样的值,默认只删除最近的一个
+                    if(!isDeleteAll){
+                        break;
+                    }
+                }
+
+            }
+
+            return ary;
+        };
+//获取所有的入口地址
+function getEntry(globPath) {
+
+    //找到正则globPath匹配的文件名(包括完整的路径)
+    let files = glob.sync(globPath),
+        entries = {},
+    entry, dirname, basename, pathname,extname;
+
+    for (let i = 0; i < files.length; i++) {
+         entry = files[i];
+
+         //文件的路径
+         dirname = path.dirname(entry);
+
+         //文件名的后缀
+         extname = path.extname(entry);
+
+         //方法返回一个 path 的最后一部分
+         basename = path.basename(entry, extname);
+         pathname = path.join(dirname, basename);
+
+         entries[basename] = entry;
+
+    }
+    entries['vendors'] = vendors;
+    return entries;
+}
+
+/**
+ * [配置webpack插件的选项]
+ * @param  {[string]} tmplsDir [html模板路径]
+ * @param  {[string]} ext      [模板的后缀名]
+ * injectArray: 需要将js插入到head的页面数组
+ * @return {[type]}          [description]
+ */
+function configHtmlWebpackOptions(tmplsDir, ext, injectArray) {
+
+    let pages = Object.keys(entries);
+    pages = deleteByValue(pages,'vendors');
+    pages.forEach(function(pagename) {
+
+       let htmlWebpackOption = {
+
+          filename: fileDir.build.view + pagename + '.html',
+          template: fileDir.origin.tmpls + pagename + '.' +ext,
+          inject: injectArray && (injectArray.indexof(pagename) !== -1)&&'head'||'body',
+          minify: {
+              removeComments: true,
+              collapseWhitespace: false
+            }
+        }
+
+        if(pagename in config.entry) {
+            htmlWebpackOption.favicon = './src/images/favicon.ico',
+            htmlWebpackOption.chunks = ['vendors', 'runtime', pagename]
+        }
+
+        config.plugins.push(
+            new htmlWebpackPlugin(htmlWebpackOption)
+            );
+    });
+}
+
+var entries = getEntry(fileDir.origin.entryJs + '**/*.js');
+//console.log(entries);
+config['entry'] = entries;
+/*var chunks = [];
+for(let prop in entries) {
+    if(entries.hasOwnProperty(prop) && prop !== 'vendors') {
+        chunks.push(entries[prop]);
+    }
+}*/
+
+configHtmlWebpackOptions(fileDir.origin.tmpls + '**/*.html', 'html');
+
 module.exports = config;
 
+var plugins = config.plugins;
+function consoleProps(obj) {
+
+  for(var prop in obj){
+      if(obj.hasOwnProperty(prop)) {
+        console.log("属性名：" + prop + ";属性值：");
+        console.log(obj[prop]);
+      }
+      if(typeof prop === 'object' && !(prop instanceof Array)) {
+          consoleProps(prop);
+      }
+  }
+};
+consoleProps(plugins);
 /*
     devServer.publicPath === output.publicPath
 
